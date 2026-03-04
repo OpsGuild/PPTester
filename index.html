@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pi Payment Tester</title>
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>&#x1F967; <span>Pi Payment</span> Tester</h1>
+      <p>Test Pi Network payments against any backend API</p>
+    </header>
+
+    <!-- HOW TO USE -->
+    <div class="card guide-card">
+      <div class="collapsible-header" onclick="toggleSection('howToUse')">
+        <h2 class="guide-title">How To Use</h2>
+        <span id="howToUseArrow" class="arrow open">&#x25B6;</span>
+      </div>
+      <div id="howToUse">
+        <ol class="guide-steps">
+          <li>Open this page in the <strong class="gold">Pi Browser</strong> app — Pi SDK only works there.</li>
+          <li>Enter your backend <strong>Base URL</strong> and <strong>Access Token</strong> under Connection.</li>
+          <li>Configure each <strong>Endpoint</strong> — set the route, method, and map which runtime variables (Pi Payment ID, Reference, TX ID) to send and how (body field, query param, or URL path).</li>
+          <li>Optionally add extra static fields in the <strong>Extra Body</strong> textarea for each endpoint.</li>
+          <li>Set the <strong>Response Mapping</strong> so the tester knows where to find the payment reference and status in your API responses.</li>
+          <li>Save your config for quick reuse across sessions.</li>
+          <li><strong>Initialize Pi SDK</strong> (Testnet for testing) and <strong>Authenticate</strong>.</li>
+          <li>Write your init payload JSON, set the Pi amount, and hit <strong>Pay with Pi</strong>.</li>
+        </ol>
+        <div class="guide-note">Use <strong>Manual Controls</strong> to call individual steps if you already have values from Postman, curl, etc.</div>
+      </div>
+    </div>
+
+    <!-- SAVED CONFIGS -->
+    <div class="card">
+      <div class="collapsible-header" onclick="toggleSection('savedConfigsBody')">
+        <h2>Saved Configurations</h2>
+        <span id="savedConfigsBodyArrow" class="arrow open">&#x25B6;</span>
+      </div>
+      <div id="savedConfigsBody">
+        <div id="savedConfigs" class="saved-configs"></div>
+        <button class="btn btn-outline btn-sm" onclick="saveCurrentConfig()">Save Current Config</button>
+      </div>
+    </div>
+
+    <!-- CONNECTION -->
+    <div class="card">
+      <div class="collapsible-header" onclick="toggleSection('connectionBody')">
+        <h2>Connection</h2>
+        <span id="connectionBodyArrow" class="arrow open">&#x25B6;</span>
+      </div>
+      <div id="connectionBody">
+      <div class="field">
+        <label>Base URL</label>
+        <input type="text" id="cfgBaseUrl" placeholder="https://api.example.com/v1" />
+      </div>
+      <div class="field">
+        <label>Access Token</label>
+        <input type="password" id="cfgAccessToken" placeholder="JWT, API key, or session token" />
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Auth Type</label>
+          <select id="cfgAuthType" onchange="onAuthTypeChange()">
+            <option value="bearer">Bearer Token</option>
+            <option value="apikey">X-API-Key</option>
+            <option value="basic">Basic Auth</option>
+            <option value="custom">Custom Header</option>
+          </select>
+        </div>
+        <div class="field" id="customHeaderField" style="display:none;">
+          <label>Custom Header Name</label>
+          <input type="text" id="cfgCustomHeader" placeholder="X-My-Auth" />
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <!-- ENDPOINT: INITIALIZE -->
+    <div class="card endpoint-card">
+      <div class="collapsible-header endpoint-header" onclick="toggleSection('epInitBody')">
+        <div class="endpoint-header-left">
+          <span class="method-badge post">POST</span>
+          <span class="endpoint-name">Initialize Payment</span>
+        </div>
+        <span id="epInitBodyArrow" class="arrow open">&#x25B6;</span>
+      </div>
+      <div id="epInitBody">
+      <div class="field">
+        <label>Route</label>
+        <input type="text" id="ep_init_route" value="/payments/initialize" />
+      </div>
+      <div class="field">
+        <label>Request Body (JSON)</label>
+        <textarea id="initPayload" rows="6" placeholder='Full JSON payload for your init endpoint'>{
+  "amount": 1,
+  "currency": "PI",
+  "provider": "pi_network",
+  "description": "Test Payment"
+}</textarea>
+        <div class="hint">Sent as-is to your init endpoint. Structure it exactly as your backend expects.</div>
+      </div>
+      <div class="field">
+        <label>Response Reference Path</label>
+        <input type="text" id="cfgResponseRefPath" value="data.reference" />
+        <div class="hint">Dot-path to extract the payment reference from the response, e.g. <code>data.reference</code></div>
+      </div>
+      </div>
+    </div>
+
+    <!-- ENDPOINT: APPROVE -->
+    <div class="card endpoint-card">
+      <div class="collapsible-header endpoint-header" onclick="toggleSection('epApproveBody')">
+        <div class="endpoint-header-left">
+          <span class="method-badge post">POST</span>
+          <span class="endpoint-name">Approve Payment</span>
+        </div>
+        <span id="epApproveBodyArrow" class="arrow">&#x25B6;</span>
+      </div>
+      <div id="epApproveBody" class="hidden">
+      <div class="field">
+        <label>Route</label>
+        <input type="text" id="ep_approve_route" value="/pi-payments/approve" />
+      </div>
+      <div class="var-map-section">
+        <div class="var-map-title">Variable Mapping</div>
+        <div class="var-map-row">
+          <label class="var-toggle"><input type="checkbox" id="ep_approve_var_piPaymentId_on" checked /><span>Pi Payment ID</span></label>
+          <select id="ep_approve_var_piPaymentId_loc"><option value="body" selected>Body</option><option value="query">Query</option><option value="url">URL Path</option></select>
+          <input type="text" id="ep_approve_var_piPaymentId_key" value="paymentId" placeholder="key name" />
+        </div>
+        <div class="var-map-row">
+          <label class="var-toggle"><input type="checkbox" id="ep_approve_var_reference_on" checked /><span>Reference</span></label>
+          <select id="ep_approve_var_reference_loc"><option value="body" selected>Body</option><option value="query">Query</option><option value="url">URL Path</option></select>
+          <input type="text" id="ep_approve_var_reference_key" value="reference" placeholder="key name" />
+        </div>
+        <div class="var-map-row">
+          <label class="var-toggle"><input type="checkbox" id="ep_approve_var_txid_on" /><span>TX ID</span></label>
+          <select id="ep_approve_var_txid_loc"><option value="body" selected>Body</option><option value="query">Query</option><option value="url">URL Path</option></select>
+          <input type="text" id="ep_approve_var_txid_key" value="txid" placeholder="key name" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Extra Body (JSON, optional)</label>
+        <textarea id="ep_approve_extra" rows="2" placeholder='{"staticField": "value"}'></textarea>
+        <div class="hint">Static fields merged into the body alongside mapped variables</div>
+      </div>
+      </div>
+    </div>
+
+    <!-- ENDPOINT: COMPLETE -->
+    <div class="card endpoint-card">
+      <div class="collapsible-header endpoint-header" onclick="toggleSection('epCompleteBody')">
+        <div class="endpoint-header-left">
+          <span class="method-badge post">POST</span>
+          <span class="endpoint-name">Complete Payment</span>
+        </div>
+        <span id="epCompleteBodyArrow" class="arrow">&#x25B6;</span>
+      </div>
+      <div id="epCompleteBody" class="hidden">
+      <div class="field">
+        <label>Route</label>
+        <input type="text" id="ep_complete_route" value="/pi-payments/complete" />
+      </div>
+      <div class="var-map-section">
+        <div class="var-map-title">Variable Mapping</div>
+        <div class="var-map-row">
+          <label class="var-toggle"><input type="checkbox" id="ep_complete_var_piPaymentId_on" checked /><span>Pi Payment ID</span></label>
+          <select id="ep_complete_var_piPaymentId_loc"><option value="body" selected>Body</option><option value="query">Query</option><option value="url">URL Path</option></select>
+          <input type="text" id="ep_complete_var_piPaymentId_key" value="paymentId" placeholder="key name" />
+        </div>
+        <div class="var-map-row">
+          <label class="var-toggle"><input type="checkbox" id="ep_complete_var_reference_on" /><span>Reference</span></label>
+          <select id="ep_complete_var_reference_loc"><option value="body" selected>Body</option><option value="query">Query</option><option value="url">URL Path</option></select>
+          <input type="text" id="ep_complete_var_reference_key" value="reference" placeholder="key name" />
+        </div>
+        <div class="var-map-row">
+          <label class="var-toggle"><input type="checkbox" id="ep_complete_var_txid_on" checked /><span>TX ID</span></label>
+          <select id="ep_complete_var_txid_loc"><option value="body" selected>Body</option><option value="query">Query</option><option value="url">URL Path</option></select>
+          <input type="text" id="ep_complete_var_txid_key" value="txid" placeholder="key name" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Extra Body (JSON, optional)</label>
+        <textarea id="ep_complete_extra" rows="2" placeholder='{"staticField": "value"}'></textarea>
+      </div>
+      </div>
+    </div>
+
+    <!-- ENDPOINT: VERIFY -->
+    <div class="card endpoint-card">
+      <div class="collapsible-header endpoint-header" onclick="toggleSection('epVerifyBody')">
+        <div class="endpoint-header-left">
+          <span class="method-badge post">POST</span>
+          <span class="endpoint-name">Verify Payment</span>
+        </div>
+        <span id="epVerifyBodyArrow" class="arrow">&#x25B6;</span>
+      </div>
+      <div id="epVerifyBody" class="hidden">
+      <div class="field">
+        <label>Route</label>
+        <input type="text" id="ep_verify_route" value="/payments/verify" />
+      </div>
+      <div class="var-map-section">
+        <div class="var-map-title">Variable Mapping</div>
+        <div class="var-map-row">
+          <label class="var-toggle"><input type="checkbox" id="ep_verify_var_piPaymentId_on" /><span>Pi Payment ID</span></label>
+          <select id="ep_verify_var_piPaymentId_loc"><option value="body" selected>Body</option><option value="query">Query</option><option value="url">URL Path</option></select>
+          <input type="text" id="ep_verify_var_piPaymentId_key" value="paymentId" placeholder="key name" />
+        </div>
+        <div class="var-map-row">
+          <label class="var-toggle"><input type="checkbox" id="ep_verify_var_reference_on" checked /><span>Reference</span></label>
+          <select id="ep_verify_var_reference_loc"><option value="body" selected>Body</option><option value="query">Query</option><option value="url">URL Path</option></select>
+          <input type="text" id="ep_verify_var_reference_key" value="reference" placeholder="key name" />
+        </div>
+        <div class="var-map-row">
+          <label class="var-toggle"><input type="checkbox" id="ep_verify_var_txid_on" /><span>TX ID</span></label>
+          <select id="ep_verify_var_txid_loc"><option value="body" selected>Body</option><option value="query">Query</option><option value="url">URL Path</option></select>
+          <input type="text" id="ep_verify_var_txid_key" value="txid" placeholder="key name" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Extra Body (JSON, optional)</label>
+        <textarea id="ep_verify_extra" rows="2" placeholder='{"provider": "pi_network"}'>{
+  "provider": "pi_network"
+}</textarea>
+      </div>
+      <div class="field">
+        <label>Response Status Path</label>
+        <input type="text" id="cfgResponseStatusPath" value="data.status" />
+        <div class="hint">Dot-path to extract payment status from the response, e.g. <code>data.status</code></div>
+      </div>
+      </div>
+    </div>
+
+    <!-- ENDPOINT: CANCEL -->
+    <div class="card endpoint-card">
+      <div class="collapsible-header endpoint-header" onclick="toggleSection('epCancelBody')">
+        <div class="endpoint-header-left">
+          <span class="method-badge post">POST</span>
+          <span class="endpoint-name">Cancel Payment</span>
+        </div>
+        <span id="epCancelBodyArrow" class="arrow">&#x25B6;</span>
+      </div>
+      <div id="epCancelBody" class="hidden">
+      <div class="field">
+        <label>Route</label>
+        <input type="text" id="ep_cancel_route" value="/pi-payments/cancelled" />
+      </div>
+      <div class="var-map-section">
+        <div class="var-map-title">Variable Mapping</div>
+        <div class="var-map-row">
+          <label class="var-toggle"><input type="checkbox" id="ep_cancel_var_piPaymentId_on" checked /><span>Pi Payment ID</span></label>
+          <select id="ep_cancel_var_piPaymentId_loc"><option value="body" selected>Body</option><option value="query">Query</option><option value="url">URL Path</option></select>
+          <input type="text" id="ep_cancel_var_piPaymentId_key" value="paymentId" placeholder="key name" />
+        </div>
+        <div class="var-map-row">
+          <label class="var-toggle"><input type="checkbox" id="ep_cancel_var_reference_on" /><span>Reference</span></label>
+          <select id="ep_cancel_var_reference_loc"><option value="body" selected>Body</option><option value="query">Query</option><option value="url">URL Path</option></select>
+          <input type="text" id="ep_cancel_var_reference_key" value="reference" placeholder="key name" />
+        </div>
+        <div class="var-map-row">
+          <label class="var-toggle"><input type="checkbox" id="ep_cancel_var_txid_on" /><span>TX ID</span></label>
+          <select id="ep_cancel_var_txid_loc"><option value="body" selected>Body</option><option value="query">Query</option><option value="url">URL Path</option></select>
+          <input type="text" id="ep_cancel_var_txid_key" value="txid" placeholder="key name" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Extra Body (JSON, optional)</label>
+        <textarea id="ep_cancel_extra" rows="2" placeholder='{"reason": "user_cancelled"}'></textarea>
+      </div>
+      </div>
+    </div>
+
+    <!-- ENDPOINT: GET STATUS -->
+    <div class="card endpoint-card">
+      <div class="collapsible-header endpoint-header" onclick="toggleSection('epStatusBody')">
+        <div class="endpoint-header-left">
+          <select id="ep_status_method" class="method-select" onclick="event.stopPropagation()">
+            <option value="GET" selected>GET</option>
+            <option value="POST">POST</option>
+          </select>
+          <span class="endpoint-name">Get Payment Status</span>
+        </div>
+        <span id="epStatusBodyArrow" class="arrow">&#x25B6;</span>
+      </div>
+      <div id="epStatusBody" class="hidden">
+      <div class="field">
+        <label>Route</label>
+        <input type="text" id="ep_status_route" value="/pi-payments/status" />
+      </div>
+      <div class="var-map-section">
+        <div class="var-map-title">Variable Mapping</div>
+        <div class="var-map-row">
+          <label class="var-toggle"><input type="checkbox" id="ep_status_var_piPaymentId_on" checked /><span>Pi Payment ID</span></label>
+          <select id="ep_status_var_piPaymentId_loc"><option value="body">Body</option><option value="query" selected>Query</option><option value="url">URL Path</option></select>
+          <input type="text" id="ep_status_var_piPaymentId_key" value="paymentId" placeholder="key name" />
+        </div>
+        <div class="var-map-row">
+          <label class="var-toggle"><input type="checkbox" id="ep_status_var_reference_on" /><span>Reference</span></label>
+          <select id="ep_status_var_reference_loc"><option value="body">Body</option><option value="query" selected>Query</option><option value="url">URL Path</option></select>
+          <input type="text" id="ep_status_var_reference_key" value="reference" placeholder="key name" />
+        </div>
+        <div class="var-map-row">
+          <label class="var-toggle"><input type="checkbox" id="ep_status_var_txid_on" /><span>TX ID</span></label>
+          <select id="ep_status_var_txid_loc"><option value="body">Body</option><option value="query" selected>Query</option><option value="url">URL Path</option></select>
+          <input type="text" id="ep_status_var_txid_key" value="txid" placeholder="key name" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Extra Body (JSON, optional)</label>
+        <textarea id="ep_status_extra" rows="2" placeholder='Only used if method is POST'></textarea>
+      </div>
+      </div>
+    </div>
+
+    <!-- PI SDK -->
+    <div class="card">
+      <div class="collapsible-header" onclick="toggleSection('piSdkBody')">
+        <h2>Pi SDK</h2>
+        <span id="piSdkBodyArrow" class="arrow open">&#x25B6;</span>
+      </div>
+      <div id="piSdkBody">
+        <div class="field">
+          <label>Mode</label>
+          <select id="piSdkMode">
+            <option value="Pi Testnet">Pi Testnet (Sandbox)</option>
+            <option value="Pi Mainnet">Pi Mainnet (Production)</option>
+          </select>
+        </div>
+        <div class="row" style="gap:8px;">
+          <button id="btnInit" class="btn btn-primary" onclick="initPiSdk()">Initialize Pi SDK</button>
+          <button id="btnAuth" class="btn btn-gold" onclick="authenticatePi()" disabled>Authenticate with Pi</button>
+        </div>
+        <div id="sdkStatus" class="status-bar hidden"></div>
+        <div id="piUser" class="hidden" style="margin-top:14px;">
+          <div class="kv"><span class="label">Username</span><span id="piUsername" class="value">--</span></div>
+          <div class="kv"><span class="label">UID</span><span id="piUid" class="value">--</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAYMENT -->
+    <div class="card">
+      <div class="collapsible-header" onclick="toggleSection('paymentBody')">
+        <h2>Payment</h2>
+        <span id="paymentBodyArrow" class="arrow open">&#x25B6;</span>
+      </div>
+      <div id="paymentBody">
+        <div class="steps">
+          <div id="step1" class="step"></div>
+          <div id="step2" class="step"></div>
+          <div id="step3" class="step"></div>
+          <div id="step4" class="step"></div>
+          <div id="step5" class="step"></div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label>Pi SDK Amount</label>
+            <input type="number" id="piAmount" value="1" min="0.01" step="0.01" />
+            <div class="hint">Amount charged via Pi SDK</div>
+          </div>
+          <div class="field">
+            <label>Pi SDK Memo</label>
+            <input type="text" id="piMemo" value="Test Payment" />
+            <div class="hint">Shown in the Pi payment dialog</div>
+          </div>
+        </div>
+        <button id="btnPay" class="btn btn-gold" onclick="startPayment()">Pay with Pi</button>
+
+        <div id="paymentResult" class="hidden" style="margin-top:16px;">
+          <hr class="divider" />
+          <div class="kv"><span class="label">Reference</span><span id="resRef" class="value">--</span></div>
+          <div class="kv"><span class="label">Pi Payment ID</span><span id="resPiId" class="value">--</span></div>
+          <div class="kv"><span class="label">TX ID</span><span id="resTxId" class="value">--</span></div>
+          <div class="kv"><span class="label">Status</span><span id="resStatus" class="value">--</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MANUAL CONTROLS -->
+    <div class="card">
+      <div class="collapsible-header" onclick="toggleSection('manualControls')">
+        <h2>Manual Controls</h2>
+        <span id="manualControlsArrow" class="arrow">&#x25B6;</span>
+      </div>
+      <div id="manualControls" class="hidden">
+        <div class="field">
+          <label>Reference</label>
+          <input type="text" id="manualRef" placeholder="Payment reference from init" />
+        </div>
+        <div class="field">
+          <label>Pi Payment ID</label>
+          <input type="text" id="manualPiId" placeholder="From Pi SDK" />
+        </div>
+        <div class="field">
+          <label>TX ID</label>
+          <input type="text" id="manualTxId" placeholder="Blockchain transaction ID" />
+        </div>
+        <div class="manual-btns">
+          <button class="btn btn-blue btn-sm" onclick="manualApprove()">Approve</button>
+          <button class="btn btn-green btn-sm" onclick="manualComplete()">Complete</button>
+          <button class="btn btn-primary btn-sm" onclick="manualVerify()">Verify</button>
+          <button class="btn btn-red btn-sm" onclick="manualCancel()">Cancel</button>
+          <button class="btn btn-outline btn-sm" onclick="manualGetStatus()">Get Status</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EVENT LOG -->
+    <div class="card">
+      <div class="collapsible-header" onclick="toggleSection('eventLogBody')">
+        <h2 style="margin:0;">Event Log</h2>
+        <span id="eventLogBodyArrow" class="arrow open">&#x25B6;</span>
+      </div>
+      <div id="eventLogBody">
+        <div style="text-align:right;margin-bottom:8px;">
+          <button class="btn btn-outline btn-sm" onclick="clearLog()">Clear</button>
+        </div>
+        <div id="log"></div>
+      </div>
+    </div>
+
+    <footer>
+      Pi Payment Tester &middot; Open in <strong class="gold">Pi Browser</strong> for full SDK support
+    </footer>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

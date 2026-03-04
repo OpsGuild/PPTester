@@ -1,0 +1,10 @@
+{
+  "name": "pptester",
+  "version": "1.0.0",
+  "description": "Universal Pi Network payment flow tester — works with any backend",
+  "private": true,
+  "scripts": {
+    "start": "npx serve -s . -l ${PORT:-3000}",
+    "dev": "npx serve -s . -l 3001"
+  }
+}
