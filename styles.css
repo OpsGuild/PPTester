@@ -185,6 +185,58 @@ footer { text-align: center; padding: 20px 0; color: var(--text-dim); font-size:
 .config-chip .delete { margin-left: 6px; color: var(--red); font-weight: bold; }
 code { background: var(--surface2); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
 
+/* Test API Key Box */
+.test-key-box {
+  margin-top: 14px;
+  padding: 14px 16px;
+  background: var(--surface3);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 8px;
+}
+.test-key-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.test-key-badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+.test-key-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.test-key-value {
+  padding: 8px 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 11px;
+  color: var(--pi-gold);
+  word-break: break-all;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.test-key-value:hover {
+  border-color: var(--pi-gold);
+}
+.test-key-hint {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.4;
+}
+
 /* Responsive */
 @media (max-width: 480px) {
   .var-map-row { grid-template-columns: 1fr; gap: 4px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }

@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" fill="none">
+  <defs>
+    <linearGradient id="bannerBg" x1="0" y1="0" x2="800" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0f1117"/>
+      <stop offset="50%" stop-color="#1a1d27"/>
+      <stop offset="100%" stop-color="#0f1117"/>
+    </linearGradient>
+    <linearGradient id="purpleGlow" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#6b21a8"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="200" rx="12" fill="url(#bannerBg)"/>
+  <!-- Subtle border -->
+  <rect x="1" y="1" width="798" height="198" rx="11" stroke="#2e3345" stroke-width="1" fill="none"/>
+  <!-- Decorative grid dots -->
+  <g opacity="0.08" fill="#7c3aed">
+    <circle cx="50" cy="30" r="2"/><circle cx="80" cy="30" r="2"/><circle cx="110" cy="30" r="2"/>
+    <circle cx="50" cy="60" r="2"/><circle cx="80" cy="60" r="2"/><circle cx="110" cy="60" r="2"/>
+    <circle cx="50" cy="90" r="2"/><circle cx="80" cy="90" r="2"/><circle cx="110" cy="90" r="2"/>
+    <circle cx="690" cy="110" r="2"/><circle cx="720" cy="110" r="2"/><circle cx="750" cy="110" r="2"/>
+    <circle cx="690" cy="140" r="2"/><circle cx="720" cy="140" r="2"/><circle cx="750" cy="140" r="2"/>
+    <circle cx="690" cy="170" r="2"/><circle cx="720" cy="170" r="2"/><circle cx="750" cy="170" r="2"/>
+  </g>
+  <!-- Icon area -->
+  <g transform="translate(120, 100)">
+    <!-- Pi symbol -->
+    <rect x="-28" y="-20" width="56" height="5" rx="2.5" fill="#f59e0b"/>
+    <rect x="-20" y="-16" width="5" height="36" rx="2.5" fill="#f59e0b"/>
+    <rect x="15" y="-16" width="5" height="30" rx="2.5" fill="#f59e0b"/>
+    <path d="M20 12 Q20 20 12 20" stroke="#f59e0b" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <!-- Check badge -->
+    <circle cx="34" cy="18" r="12" fill="#22c55e"/>
+    <path d="M28 18 L32 22 L40 14" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <!-- Title -->
+  <text x="260" y="82" font-family="system-ui, -apple-system, sans-serif" font-size="38" font-weight="800" fill="#e2e8f0">Pi Payment</text>
+  <text x="515" y="82" font-family="system-ui, -apple-system, sans-serif" font-size="38" font-weight="800" fill="#f59e0b"> Tester</text>
+  <!-- Subtitle -->
+  <text x="260" y="115" font-family="system-ui, -apple-system, sans-serif" font-size="16" fill="#94a3b8">Test Pi Network payments against any backend API</text>
+  <!-- Tags -->
+  <g transform="translate(260, 135)">
+    <rect x="0" y="0" width="90" height="24" rx="5" fill="rgba(124,58,237,0.15)"/>
+    <text x="45" y="16" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" font-weight="600" fill="#7c3aed">Backend Agnostic</text>
+    <rect x="100" y="0" width="64" height="24" rx="5" fill="rgba(245,158,11,0.15)"/>
+    <text x="132" y="16" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" font-weight="600" fill="#f59e0b">Pi SDK</text>
+    <rect x="174" y="0" width="72" height="24" rx="5" fill="rgba(34,197,94,0.15)"/>
+    <text x="210" y="16" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" font-weight="600" fill="#22c55e">Zero Build</text>
+    <rect x="256" y="0" width="80" height="24" rx="5" fill="rgba(59,130,246,0.15)"/>
+    <text x="296" y="16" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" font-weight="600" fill="#3b82f6">Configurable</text>
+  </g>
+</svg>

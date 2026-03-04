@@ -31,10 +31,13 @@
           <li><strong>Initialize Pi SDK</strong> (Testnet for testing) and <strong>Authenticate</strong>.</li>
           <li>Write your init payload JSON, set the Pi amount, and hit <strong>Pay with Pi</strong>.</li>
         </ol>
-        <div class="guide-note" style="margin-top:12px; padding:10px; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:6px;">
-          <strong style="color:#ef4444;">Test API Key (Development Only):</strong><br/>
-          <code style="word-break:break-all;">srcnglkfqpdviyqrcws3cynesendts2re44lgzk5dhocnezqgsgn2enbou9csd5s</code><br/>
-          <span style="font-size:11px;">Add this to your backend as an env variable (e.g. <code>PI_API_KEY</code>). <strong style="color:#ef4444;">Do NOT use in production</strong> — replace with your own key before going live.</span>
+        <div class="test-key-box">
+          <div class="test-key-header">
+            <span class="test-key-badge">DEV ONLY</span>
+            <span class="test-key-title">Test API Key</span>
+          </div>
+          <div class="test-key-value" onclick="navigator.clipboard.writeText(this.textContent.trim()).then(()=>{this.title='Copied!'});" title="Click to copy">srcnglkfqpdviyqrcws3cynesendts2re44lgzk5dhocnezqgsgn2enbou9csd5s</div>
+          <p class="test-key-hint">Add as <code>PI_API_KEY</code> env variable in your backend. Not for production use.</p>
         </div>
         <div class="guide-note">Use <strong>Manual Controls</strong> to call individual steps if you already have values from Postman, curl, etc.</div>
       </div>

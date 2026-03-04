@@ -1,8 +1,12 @@
+<p align="center">
+  <img src="assets/banner.svg" alt="PPTester Banner" width="100%" />
+</p>
+
 # Pi Payment Tester
 
 A standalone, deployable frontend for testing Pi Network payment flows against **any** backend API.
 
-**Live App:** [https://pptester.netlify.app/](https://pptester.netlify.app/)
+**Live App:** [https://pptester.netlify.app/](https://pptester.netlify.app/) | [Privacy Policy](PRIVACY_POLICY.md) | [Terms](TERMS_AND_CONDITIONS.md)
 
 ## Features
 
