@@ -2,6 +2,8 @@
 
 A standalone, deployable frontend for testing Pi Network payment flows against **any** backend API.
 
+**Live App:** [https://pptester.netlify.app/](https://pptester.netlify.app/)
+
 ## Features
 
 - **Backend-agnostic** — every endpoint is fully configurable
@@ -23,6 +25,8 @@ npx serve -s . -l 3001
 ```
 
 Open `http://localhost:3001` in a browser (or Pi Browser for SDK features).
+
+Or use the live version at [https://pptester.netlify.app/](https://pptester.netlify.app/) — open in **Pi Browser** for full SDK support.
 
 ## Deploy
 
