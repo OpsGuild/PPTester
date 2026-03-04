@@ -17,6 +17,16 @@ A standalone, deployable frontend for testing Pi Network payment flows against *
 - **Pi Browser compatible** — must be opened in Pi Browser for SDK to work
 - **Zero build step** — pure static HTML/CSS/JS, deploy anywhere
 
+## Test API Key (Development Only)
+
+> **WARNING: This API key is for DEVELOPMENT and TESTING only. DO NOT use it in production.**
+
+```
+srcnglkfqpdviyqrcws3cynesendts2re44lgzk5dhocnezqgsgn2enbou9csd5s
+```
+
+Add this key to your backend as an environment variable (e.g. `PI_API_KEY`) and use it to authenticate requests from this tester during development. **Replace it with your own production key before going live.**
+
 ## Quick Start (Local)
 
 ```bash
